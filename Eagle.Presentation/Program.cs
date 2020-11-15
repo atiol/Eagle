@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace Eagle.Presentation
@@ -15,11 +10,18 @@ namespace Eagle.Presentation
     {
         public static void Main(string[] args)
         {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            var config = new ConfigurationBuilder().AddJsonFile($"appsettings.{environment}.json", optional: true).Build();
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(config)
+                .CreateLogger();
+            
             try
             {
                 Log.Information("Application Starting...");
-                using IHost host = CreateHostBuilder(args).Build();
-                host.Run();
+                CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {
@@ -42,25 +44,11 @@ namespace Eagle.Presentation
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>()
-                        .CaptureStartupErrors(true)
-                        .ConfigureAppConfiguration(config => {
-                            config.AddJsonFile("appsettings.json", optional: true);
-                        })
-                        .UseSerilog((hostingContext, loggerConfiguration) => {
-                            loggerConfiguration
-                                .ReadFrom.Configuration(hostingContext.Configuration)
-                                .Enrich.FromLogContext()
-                                .Enrich.WithProperty("ApplicationName", typeof(Program).Assembly.GetName().Name)
-                                .Enrich.WithProperty("Environment", hostingContext.HostingEnvironment);
-#if DEBUG
-                            // Used to filter out potentially bad data due debugging.
-                            // Very useful when doing Seq dashboards and want to remove logs under debugging session.
-                            loggerConfiguration.Enrich.WithProperty("DebuggerAttached", Debugger.IsAttached);
-#endif
-                        });
+                        .CaptureStartupErrors(true);
                 });
     }
 }
