@@ -11,7 +11,6 @@ namespace Eagle.Presentation
         public static void Main(string[] args)
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
             var config = new ConfigurationBuilder().AddJsonFile($"appsettings.{environment}.json", optional: true).Build();
 
             Log.Logger = new LoggerConfiguration()
