@@ -18,11 +18,15 @@ namespace Eagle.Presentation.Helpers
 
             var exception = context.Exception;
 
-            var customException = CustomExceptions.Unknown;
-            var response = new ResponseModel(false, CustomExceptions.Unknown.Message);
+            
 
             if (exception != null)
             {
+                var customException = CustomExceptions.Unknown;
+                var response = new ResponseModel(false, CustomExceptions.Unknown.Message);
+
+                context.HttpContext.Response.ContentType = "application/json";
+
                 if (exception is CustomException || exception is CustomException<IEnumerable<string>>)
                 {
                     customException = exception as CustomException;
@@ -37,10 +41,10 @@ namespace Eagle.Presentation.Helpers
                     response = new ResponseModel(false, customException.Message);
                     //logger.Error(exception.Message);
                 }
-            }
 
-            context.Result = new JsonResult(response);
-            context.ExceptionHandled = true;
+                context.Result = new JsonResult(response);
+                context.ExceptionHandled = true;
+            }
         }
 
         public void OnActionExecuting(ActionExecutingContext context) { }

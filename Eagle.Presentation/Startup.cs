@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Eagle.Common;
 using Eagle.Presentation.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,6 +54,8 @@ namespace Eagle.Presentation
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+
+            services.AddLocalization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +65,13 @@ namespace Eagle.Presentation
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                SupportedCultures = Constants.SupportedCultures,
+                SupportedUICultures = Constants.SupportedCultures,
+                DefaultRequestCulture = new RequestCulture(Constants.SupportedCultures[1])
+            });
 
             // This will make the HTTP requests log as rich logs instead of plain text.
             app.UseSerilogRequestLogging();

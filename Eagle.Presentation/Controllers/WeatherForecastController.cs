@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Eagle.Common.ResponseModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace Eagle.Presentation.Controllers
@@ -16,10 +14,12 @@ namespace Eagle.Presentation.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly IStringLocalizer<Resources.Resources> _localizer;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IStringLocalizer<Resources.Resources> localizer): base(localizer)
         {
             _logger = logger;
+            _localizer = localizer;
         }
 
         [HttpGet]
@@ -34,14 +34,14 @@ namespace Eagle.Presentation.Controllers
             //})
             //.ToArray();
 
-            if (rng != null)
+            if (rng == null)
             {
-                _logger.LogError("An error occurred!");
-                throw CustomExceptions.Unknown;
+                throw CustomExceptions.RecordNotFound;
             }
 
-            _logger.LogInformation("Success!!!");
-            return Ok(new ResponseModel<string>(true, "success!", "Atiol"));
+            var localizedMessage = _localizer["Success"];
+
+            return Ok(new ResponseModel(true, localizedMessage));
         }
     }
 }
