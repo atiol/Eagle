@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Eagle.Presentation": {
+    "Eagle": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
